@@ -8,5 +8,7 @@ description = "A simple Linux CLI that displays lyrics from the MPRIS `xesam:asT
 [features]
 
 [dependencies]
-lrc = "0.2.0"
 mpris = "2.1.0"
+lrc = "0.2.0"
+ratatui = "0.30.2"
+crossterm = "0.29.0"

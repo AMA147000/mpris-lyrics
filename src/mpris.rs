@@ -47,7 +47,7 @@ impl PlayerState {
                     if text.is_empty() {
                         None
                     } else {
-                        Some(text.parse().expect("failed to parse lyrics"))
+                        Some(text.parse().expect("failed to parse lyrics")) // TODO: return error instead of panicking
                     }
                 }
                 None => None,
