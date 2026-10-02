@@ -126,7 +126,7 @@ impl App {
                     .enumerate()
                     .map(|(idx, (_time, arc_line))| {
                         let mut line_str = arc_line.as_ref();
-                        if line_str.trim().is_empty() {
+                        if line_str.is_empty() {
                             line_str = "♪ ♪ ♪";
                         }
                         let line = Line::from(line_str);

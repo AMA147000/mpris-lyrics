@@ -1,9 +1,9 @@
 use std::time::Instant;
 
-use lrc::Lyrics;
+use lrc::{Lyrics, TimeTag};
 use mpris::Player;
 
-use crate::METADATA_REFRESH_DURATION;
+use crate::{LRC_START_THRESHOLD, METADATA_REFRESH_DURATION};
 
 #[derive(Clone)]
 pub(crate) struct PlayerState {
@@ -47,7 +47,22 @@ impl PlayerState {
                     if text.is_empty() {
                         None
                     } else {
-                        Some(text.parse().expect("failed to parse lyrics")) // TODO: return error instead of panicking
+                        let mut lyrics: Lyrics = text.parse().expect("failed to parse lyrics");
+                        // Check whether the lyrics are LRC or plain text
+                        if let Some(first_line) = lyrics.get_timed_lines().first() {
+                            // Add starting line if first timestamp is after more than LRC_START_THRESHOLD
+                            if first_line.0 > TimeTag::new(LRC_START_THRESHOLD) {
+                                lyrics
+                                    .add_timed_line(TimeTag::new(0), "")
+                                    .expect("failed to insert starting line"); // TODO: return error instead of panicking
+                            } else if first_line.0 > TimeTag::new(0) {
+                                lyrics
+                                    .add_timed_line(TimeTag::new(0), " ")
+                                    .expect("failed to insert starting line"); // TODO: return error instead of panicking
+                            }
+                        }
+
+                        Some(lyrics)
                     }
                 }
                 None => None,
