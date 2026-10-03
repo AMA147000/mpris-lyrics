@@ -1,7 +1,24 @@
 # MPRIS Lyrics
 A simple Linux CLI that displays lyrics (LRC synced or plain text) from a player that supports the MPRIS protocol.
 
-*The catch is that this one doesn't fetch lyrics from online services. It works if your player supplies the lyrics using the `xesam:asText` property.*
+*The catch is that this one doesn't fetch lyrics from online services. It works by displaying the lyrics supplied by your player using the [`xesam:asText`](https://www.freedesktop.org/wiki/Specifications/mpris-spec/metadata/#xesam:astext) property.*
+
+## Showcase
+![CLI in action](showcase.gif)
+
+*Recorded using [vhs](https://github.com/charmbracelet/vhs), the tape file can be found at [`showcase.tape`](./showcase.tape).*
+*The player used is a modified version of [Supersonic](https://github.com/supersonic-app/supersonic) that supports lyrics over MPRIS (hopefully will upstream it soon).*
+
+## Installation
+```bash
+cargo install mpris-lyrics
+```
+
+or even better (if you have it):
+
+```bash
+cargo binstall mpris-lyrics
+```
 
 ## Contributing
 All types of contributions are welcome!
@@ -19,6 +36,7 @@ For code, documentation, etc... AI usage is permitted only for review and boiler
 Also then, the human author is responsible for any bugs or issues.
 
 This is done to ensure the project stays high quality (at least as much as I can (o_o;)), and the license remains unstained by unlicensable AI generated code.
+And of course, a ton of ethical concerns (though, to be honest, you should not use it at all due to these concerns).
 
 ## License
 Copyright (c) 2026 AMA

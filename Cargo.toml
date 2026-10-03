@@ -3,7 +3,9 @@ name = "mpris-lyrics"
 version = "0.1.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-description = "A simple Linux CLI that displays lyrics from the MPRIS `xesam:asText` property"
+description = "A simple Linux CLI that displays synced lyrics from the MPRIS `xesam:asText` property"
+repository = "https://codeberg.org/AMA147000/mpris-lyrics"
+keywords = ["mpris", "lyrics", "lrc", "cli"]
 
 [features]
 
