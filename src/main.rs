@@ -9,13 +9,14 @@ use crate::tui::App;
 mod mpris;
 mod tui;
 
-const REFRESH_RATE: u64 = 30; // Hz (how often to refresh the screen and position)
-const METADATA_REFRESH_RATE: u64 = 5; // Hz (how often to refresh metadata)
-const SCROLL_TIMEOUT: Duration = Duration::from_millis(1000); // ms (how much time to wait since last scroll before auto-scrolling takes over again)
-const LRC_START_THRESHOLD: u32 = 5000; // ms (the threshold without lyrics acceptable before inserting a "♪ ♪ ♪")
-
-const REFRESH_DURATION: Duration = Duration::from_millis(1000 / REFRESH_RATE);
-const METADATA_REFRESH_DURATION: Duration = Duration::from_millis(1000 / METADATA_REFRESH_RATE);
+/// How often to refresh the screen and position
+const REFRESH_INTERVAL: Duration = Duration::from_millis(1000 / 30);
+/// How often to refresh metadata
+const METADATA_REFRESH_INTERVAL: Duration = Duration::from_millis(1000 / 5);
+/// How much time to wait since last scroll before auto-scrolling takes over again
+const SCROLL_TIMEOUT_DURATION: Duration = Duration::from_millis(1000);
+/// The threshold without lyrics acceptable before inserting a "♪ ♪ ♪"
+const LRC_START_THRESHOLD: Duration = Duration::from_millis(5000);
 
 fn main() {
     let mut terminal = ratatui::init();
@@ -25,7 +26,7 @@ fn main() {
         let player = match finder.find_active() {
             Ok(p) => p,
             Err(_) => {
-                thread::sleep(REFRESH_DURATION);
+                thread::sleep(REFRESH_INTERVAL);
                 continue;
             }
         };

@@ -3,7 +3,7 @@ use std::time::Instant;
 use lrc::{Lyrics, TimeTag};
 use mpris::Player;
 
-use crate::{LRC_START_THRESHOLD, METADATA_REFRESH_DURATION};
+use crate::{LRC_START_THRESHOLD, METADATA_REFRESH_INTERVAL};
 
 #[derive(Clone)]
 pub(crate) struct PlayerState {
@@ -23,7 +23,7 @@ impl Default for PlayerState {
             lyrics: None,
             metadata_last_updated: {
                 let instant = Instant::now();
-                instant - METADATA_REFRESH_DURATION
+                instant - METADATA_REFRESH_INTERVAL
             },
         }
     }
@@ -33,7 +33,7 @@ impl PlayerState {
     pub(crate) fn update(&mut self, player: &Player) -> Result<(), mpris::DBusError> {
         self.position_ms = player.get_position_in_microseconds().unwrap_or(0) / 1000;
 
-        if self.metadata_last_updated.elapsed() > METADATA_REFRESH_DURATION {
+        if self.metadata_last_updated.elapsed() > METADATA_REFRESH_INTERVAL {
             let metadata = player.get_metadata()?;
 
             self.title = metadata.title().map(|s| s.to_string());
@@ -51,7 +51,7 @@ impl PlayerState {
                         // Check whether the lyrics are LRC or plain text
                         if let Some(first_line) = lyrics.get_timed_lines().first() {
                             // Add starting line if first timestamp is after more than LRC_START_THRESHOLD
-                            if first_line.0 > TimeTag::new(LRC_START_THRESHOLD) {
+                            if first_line.0 > TimeTag::new(LRC_START_THRESHOLD.as_millis() as i64) {
                                 lyrics
                                     .add_timed_line(TimeTag::new(0), "")
                                     .expect("failed to insert starting line"); // TODO: return error instead of panicking

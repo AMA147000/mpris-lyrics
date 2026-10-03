@@ -11,7 +11,7 @@ use ratatui::widgets::{Block, Paragraph};
 use ratatui::{DefaultTerminal, Frame};
 
 use crate::mpris::PlayerState;
-use crate::{REFRESH_DURATION, SCROLL_TIMEOUT};
+use crate::{REFRESH_INTERVAL, SCROLL_TIMEOUT_DURATION};
 
 pub(crate) struct App {
     player_name: String,
@@ -31,7 +31,7 @@ impl App {
             lyrics_vertical_scroll: 0,
             last_scroll: {
                 let instant = Instant::now();
-                instant - SCROLL_TIMEOUT
+                instant - SCROLL_TIMEOUT_DURATION
             },
             exit: false,
         }
@@ -51,7 +51,7 @@ impl App {
         terminal.draw(|frame| self.draw(frame, state))?;
 
         // Handle user inputs in the time the app was gonna wait anyways
-        if let Some(remaining) = REFRESH_DURATION.checked_sub(frame_start.elapsed()) {
+        if let Some(remaining) = REFRESH_INTERVAL.checked_sub(frame_start.elapsed()) {
             self.handle_events(remaining)?;
         }
 
@@ -102,7 +102,7 @@ impl App {
         // Reset scroll when new song starts
         if self.last_title != state.title || self.last_artist != state.artists {
             self.lyrics_vertical_scroll = 0;
-            self.last_scroll = Instant::now() - SCROLL_TIMEOUT; // ensure we auto-scroll immediately
+            self.last_scroll = Instant::now() - SCROLL_TIMEOUT_DURATION; // ensure we auto-scroll immediately
             self.last_title = state.title.clone();
             self.last_artist = state.artists.clone();
         }
@@ -115,7 +115,7 @@ impl App {
                     .unwrap_or(0);
 
                 // Allow scrolling outside of the auto-scroll window
-                if self.last_scroll.elapsed() > SCROLL_TIMEOUT {
+                if self.last_scroll.elapsed() > SCROLL_TIMEOUT_DURATION {
                     let middle_row = lyrics_area.height / 2;
                     self.lyrics_vertical_scroll = (offset as u16).saturating_sub(middle_row);
                 }
