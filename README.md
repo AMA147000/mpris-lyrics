@@ -7,7 +7,7 @@ A simple Linux CLI that displays lyrics (LRC synced or plain text) from a player
 ![CLI in action](showcase.gif)
 
 *Recorded using [vhs](https://github.com/charmbracelet/vhs), the tape file can be found at [`showcase.tape`](./showcase.tape).*
-*The player used is a modified version of [Supersonic](https://github.com/supersonic-app/supersonic) that supports lyrics over MPRIS (hopefully will upstream it soon).*
+*The player used is a modified version of [Supersonic](https://github.com/supersonic-app/supersonic) that supports lyrics over MPRIS (got upstreamed, should be available in the next release).*
 
 ## Installation
 ```bash
