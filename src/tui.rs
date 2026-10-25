@@ -3,6 +3,7 @@ use std::process::exit;
 use std::time::{Duration, Instant};
 
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
+use lrc::Lyrics;
 use ratatui::layout::{Constraint, Layout};
 use ratatui::style::Stylize;
 use ratatui::symbols::border;
@@ -44,13 +45,14 @@ impl App {
         terminal: &mut DefaultTerminal,
         frame_start: Instant,
         state: &PlayerState,
+        override_lyrics: &Option<Lyrics>,
     ) -> io::Result<()> {
         if self.exit {
             ratatui::restore();
             exit(0);
         }
 
-        terminal.draw(|frame| self.draw(frame, state))?;
+        terminal.draw(|frame| self.draw(frame, state, override_lyrics))?;
 
         // Handle user inputs in the time the app was gonna wait anyways
         if let Some(remaining) = REFRESH_INTERVAL.checked_sub(frame_start.elapsed()) {
@@ -60,7 +62,7 @@ impl App {
         Ok(())
     }
 
-    fn draw(&mut self, frame: &mut Frame, state: &PlayerState) {
+    fn draw(&mut self, frame: &mut Frame, state: &PlayerState, override_lyrics: &Option<Lyrics>) {
         let title = Line::from(format! {" {} ", self.player_name}.bold());
         let instructions = Line::from(vec![
             " Scroll up ".into(),
@@ -109,7 +111,13 @@ impl App {
             self.last_artist = state.artists.clone();
         }
 
-        if let Some(lyrics) = &state.lyrics {
+        let lyrics = if override_lyrics.is_some() {
+            override_lyrics
+        } else {
+            &state.lyrics
+        };
+
+        if let Some(lyrics) = lyrics {
             // Check whether the lyrics are LRC or plain text
             let lyrics = if !lyrics.get_timed_lines().is_empty() {
                 let offset = lyrics

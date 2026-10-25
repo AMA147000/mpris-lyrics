@@ -42,35 +42,38 @@ impl PlayerState {
                 .map(|artists| artists.into_iter().map(|s| s.to_string()).collect());
 
             let lyrics_str = metadata.get("xesam:asText").and_then(|v| v.as_str());
-            self.lyrics = match lyrics_str {
-                Some(text) => {
-                    if text.is_empty() {
-                        None
-                    } else {
-                        let mut lyrics: Lyrics = text.parse().expect("failed to parse lyrics");
-                        // Check whether the lyrics are LRC or plain text
-                        if let Some(first_line) = lyrics.get_timed_lines().first() {
-                            // Add starting line if first timestamp is after more than LRC_START_THRESHOLD
-                            if first_line.0 > TimeTag::new(LRC_START_THRESHOLD.as_millis() as i64) {
-                                lyrics
-                                    .add_timed_line(TimeTag::new(0), "")
-                                    .expect("failed to insert starting line"); // TODO: return error instead of panicking
-                            } else if first_line.0 > TimeTag::new(0) {
-                                lyrics
-                                    .add_timed_line(TimeTag::new(0), " ")
-                                    .expect("failed to insert starting line"); // TODO: return error instead of panicking
-                            }
-                        }
-
-                        Some(lyrics)
-                    }
-                }
-                None => None,
-            };
-
+            self.lyrics = parse_lyrics(lyrics_str);
             self.metadata_last_updated = Instant::now();
         }
 
         Ok(())
+    }
+}
+
+pub(crate) fn parse_lyrics(lyrics_str: Option<&str>) -> Option<Lyrics> {
+    match lyrics_str {
+        Some(text) => {
+            if text.is_empty() {
+                None
+            } else {
+                let mut lyrics: Lyrics = text.parse().expect("failed to parse lyrics");
+                // Check whether the lyrics are LRC or plain text
+                if let Some(first_line) = lyrics.get_timed_lines().first() {
+                    // Add starting line if first timestamp is after more than LRC_START_THRESHOLD
+                    if first_line.0 > TimeTag::new(LRC_START_THRESHOLD.as_millis() as i64) {
+                        lyrics
+                            .add_timed_line(TimeTag::new(0), "")
+                            .expect("failed to insert starting line"); // TODO: return error instead of panicking
+                    } else if first_line.0 > TimeTag::new(0) {
+                        lyrics
+                            .add_timed_line(TimeTag::new(0), " ")
+                            .expect("failed to insert starting line"); // TODO: return error instead of panicking
+                    }
+                }
+
+                Some(lyrics)
+            }
+        }
+        None => None,
     }
 }
