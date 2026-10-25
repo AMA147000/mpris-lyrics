@@ -19,6 +19,7 @@ pub(crate) struct App {
     last_artist: Option<Vec<String>>,
     lyrics_vertical_scroll: u16,
     last_scroll: Instant,
+    current_line: usize,
     exit: bool,
 }
 
@@ -33,6 +34,7 @@ impl App {
                 let instant = Instant::now();
                 instant - SCROLL_TIMEOUT_DURATION
             },
+            current_line: 0,
             exit: false,
         }
     }
@@ -115,9 +117,13 @@ impl App {
                     .unwrap_or(0);
 
                 // Allow scrolling outside of the auto-scroll window
-                if self.last_scroll.elapsed() > SCROLL_TIMEOUT_DURATION {
-                    let middle_row = lyrics_area.height / 2;
-                    self.lyrics_vertical_scroll = (offset as u16).saturating_sub(middle_row);
+                // and only re-engage auto-scroll on a line change
+                if offset != self.current_line {
+                    self.current_line = offset;
+                    if self.last_scroll.elapsed() > SCROLL_TIMEOUT_DURATION {
+                        let middle_row = lyrics_area.height / 2;
+                        self.lyrics_vertical_scroll = (offset as u16).saturating_sub(middle_row);
+                    }
                 }
 
                 let lines: Vec<_> = lyrics
