@@ -26,6 +26,7 @@ A simple Linux CLI that displays synced lyrics from the MPRIS `xesam:asText` pro
 usage: mpris-lyrics [options]
     options:
         -l, --lrc <path>   specifies a single LRC file to override the lyrics of all the songs with
+        -v, --version      display the current version
         -h, --help         display this help message
 
     note: when using the `-l, --lrc` options, changes in the file reflect automatically (useful as \
@@ -98,6 +99,10 @@ fn parse_args(args: Vec<String>) -> Option<PathBuf> {
         None
     } else if args.len() == 2 && (args[1] == "-h" || args[1] == "--help") {
         println!("{}", HELP_MESSAGE);
+        exit(0);
+    } else if args.len() == 2 && (args[1] == "-v" || args[1] == "--version") {
+        let version = env!("CARGO_PKG_VERSION");
+        println!("v{}", version);
         exit(0);
     } else if args.len() == 3 && (args[1] == "-l" || args[1] == "--lrc") {
         Some(args[2].clone().into())
